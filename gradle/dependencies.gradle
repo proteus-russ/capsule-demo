@@ -1,0 +1,69 @@
+
+if(compileLibraries) {
+    println 'Compiling Libraries Is Enabled'
+    sourceSets {
+        libraries {
+            java { srcDirs = []}
+            resources { srcDirs = []}
+        }
+    }
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:all,-deprecation,-processing'
+    options.compilerArgs << '-parameters'
+    options.incremental = true
+}
+compileTestJava { options.incremental = true }
+
+
+configurations {
+    runtimeaspects { transitive = false }
+    compiletimeaspects { transitive = false }
+    if(compileLibraries) {
+        librariesCompile.extendsFrom compile
+        librariesRuntime.extendsFrom runtime
+    }
+}
+dependencies {
+
+    if(compileLibraries) {
+        librariesCompile sourceSets.main.output
+    }
+
+    compile 'co.paralleluniverse:capsule:1.0.3'
+    caplet 'co.paralleluniverse:capsule-daemon:0.2.0'
+
+    compile('com.capmc:capmc-transport:2.+') {
+        exclude group: 'ch.qos.logback'
+    }
+
+/*
+    runtimeaspects "org.springframework:spring-instrument:${version_spring}", "org.aspectj:aspectjweaver:${aspectjVersion}"
+    compiletimeaspects "org.springframework:spring-aspects:${version_spring}", "org.aspectj:aspectjtools:${aspectjVersion}"
+
+
+    // Most apps use spring.
+    compile "org.springframework:spring-core:${version_spring}",
+        "org.springframework:spring-beans:${version_spring}",
+        "org.springframework:spring-jdbc:${version_spring}",
+        "org.springframework:spring-aop:${version_spring}",
+        "org.springframework:spring-context:${version_spring}",
+        "org.springframework:spring-orm:${version_spring}",
+        "org.springframework:spring-web:${version_spring}",
+        "org.springframework:spring-test:${version_spring}",
+        "org.springframework:spring-instrument:${version_spring}",
+        "org.springframework:spring-aspects:${version_spring}"*/
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.testng:testng:6.8.13'
+    testCompile('org.uncommons:reportng:1.1.2') {
+        exclude group: "org.testng", module: "testng"
+    }
+    testCompile 'org.apache.derby:derby:10.12.1.1'
+    testRuntime 'com.google.inject:guice:4.0'
+
+
+
+}
